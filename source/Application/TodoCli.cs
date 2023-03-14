@@ -32,7 +32,10 @@ public class TodoCli
         {
             listCmd.Description = "Show all task lists";
 
-            listCmd.OnExecuteAsync(token => taskListsCommand.ExecuteAsync(token));
+            var filter = listCmd.Option<string>("-f|--filter <NAME>", "Display name filter", CommandOptionType.SingleValue);
+            filter.DefaultValue = "";
+
+            listCmd.OnExecuteAsync(token => taskListsCommand.ExecuteAsync(filter.Value(), token));
         });
 
         app.Command("task", taskCmd =>
