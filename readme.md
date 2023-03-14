@@ -34,17 +34,33 @@ dotnet user-secrets set Graph:ClientId <client-id> --project MicrosoftTodoCli.cs
 3. Run
 
 ## Usage
+### Who
 Show logged in user
 ```bash
 dotnet run who
 ```
-Show logged users task lists
+### Lists
+Show user's task lists
 ```bash
 dotnet run list
 ```
-Show logged users tasks
+
+Show user's task lists with filter
 ```bash
-dotnet run task <list-id>
+dotnet run list -f|--filter <DISPLAY-NAME>
+```
+### Tasks
+Show user's tasks (first list returned)
+```bash
+dotnet run task
+```
+Show user's tasks (in a specific list by id)
+```bash
+dotnet run task --id <LIST-ID>
+```
+Show user's tasks (first list found by filter)
+```bash
+dotnet run task -l|--list <LIST-NAME>
 ```
 
 ## Credits

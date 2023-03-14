@@ -1,6 +1,7 @@
 using Azure.Identity;
 using HackTogether.Todo.Cli.Configuration;
 using Microsoft.Graph;
+using static Microsoft.Graph.Me.Todo.Lists.ListsRequestBuilder;
 
 namespace HackTogether.Todo.Cli.Commands;
 
@@ -13,7 +14,7 @@ public class TasksCommand
         this.graphConfiguration = graphConfiguration;
     }
 
-    public async Task<int> ExecuteAsync(string query, CancellationToken cancellationToken)
+    public async Task<int> ExecuteAsync(string? listName, string? id, CancellationToken cancellationToken)
     {
         try
         {
@@ -25,7 +26,20 @@ public class TasksCommand
             var tokenCredential = new InteractiveBrowserCredential(interactiveBrowserCredentialOptions);
 
             var graphClient = new GraphServiceClient(tokenCredential, scopes);
-            var result = await graphClient.Me.Todo.Lists[query].Tasks.GetAsync(cancellationToken: cancellationToken);
+
+            if (id == null)
+            {   Action<ListsRequestBuilderGetRequestConfiguration>? requestConfiguration = configuration =>
+                {
+                    configuration.QueryParameters.Filter = $"contains(displayName, '{listName}')";
+                };
+            
+                var listResult = await graphClient.Me.Todo.Lists.GetAsync(requestConfiguration, cancellationToken);
+                var firstList = listResult.Value.FirstOrDefault();
+
+                id = firstList?.Id;
+            }
+
+            var result = await graphClient.Me.Todo.Lists[id].Tasks.GetAsync(cancellationToken: cancellationToken);
             
             var todoTasks = result?.Value;
             if (todoTasks?.Count == 0)

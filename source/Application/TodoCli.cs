@@ -42,9 +42,13 @@ public class TodoCli
         {
             taskCmd.Description = "Show all tasks in a given list";
 
-            var listId = taskCmd.Argument("id", "List id");
+            var listName = taskCmd.Option<string>("-l|--list <NAME>", "List name", CommandOptionType.SingleValue);
+            listName.DefaultValue = "";
 
-            taskCmd.OnExecuteAsync(token => tasksCommand.ExecuteAsync(listId.Value ?? string.Empty, token));
+            var id = taskCmd.Option<string>("--id <LISTID>", "List Id", CommandOptionType.SingleValue);
+            id.DefaultValue = null;
+            
+            taskCmd.OnExecuteAsync(token => tasksCommand.ExecuteAsync(listName.Value(), id.Value(), token));
         });
 
         app.Command("who", listCmd =>
